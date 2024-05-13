@@ -19,12 +19,11 @@ func (usr User) Create() User {
         fmt.Printf("Error hashing password for user %d\n", usr.Id)
         fmt.Println(err)
     }
-
     hashedpass := string(bytes)
     res, err := controllers.DB.Exec(`
-        INSERT INTO admins (id, username, password)
-        VALUES (?, ?, ?);
-    `, usr.Id, usr.Username, hashedpass)
+        INSERT INTO admins (username, password)
+        VALUES (?, ?);
+    `, usr.Username, hashedpass)
     if err != nil {
         fmt.Printf("Error inserting user with id %d into database", usr.Id)
         fmt.Println(err)
@@ -83,20 +82,35 @@ func ReadUserByName(username string) User {
 }
 
 func (usr User) Update(key string, value string){
-    res, err := controllers.DB.Exec(`UPDATE admins SET ? = ? WHERE id = ?;`, key, value, usr.Id)
+    if key != "username" && key != "password" {
+        fmt.Printf("Error updating user, key is invalid")
+        return
+    }
+    if key == "password" {
+        bytes, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 14)
+        if err != nil {
+            fmt.Printf("Error hashing password for user %d while updating\n", usr.Id)
+            fmt.Println(err)
+        }
+        pass := string(bytes)   
+        value = pass
+    }
+
+    query := "UPDATE admins SET " + key + " = ? WHERE id = ?;"
+
+    res, err := controllers.DB.Exec(query, value, usr.Id)
     if err != nil {
         fmt.Printf("Error updating user with id %d\n", usr.Id)
         fmt.Println(err)
     }
-
-    newUsrId, err := res.LastInsertId()
+    
+    rows, err := res.RowsAffected()
     if err != nil {
-        fmt.Printf("Error getting last insert id during update of user with id %d", usr.Id)
+        fmt.Printf("Error updating user with id %d rows affected not received\n", usr.Id)
         fmt.Println(err)
+    } else {
+        fmt.Println("Rows affected: ", rows)
     }
-
-    newUsr := ReadUserById(int(newUsrId))
-    usr = newUsr
 }
 
 func (usr User) Delete(){
