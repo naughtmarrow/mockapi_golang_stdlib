@@ -221,6 +221,5 @@ func (d *UsersRoute) DeleteUserById(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-    TODO: MAKE USER SEEDER
     TODO: MAKE HTMX PAGE FOR USER ADMINISTRATION
 */

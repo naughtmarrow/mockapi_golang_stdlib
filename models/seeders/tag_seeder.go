@@ -1,2 +1,2 @@
-package seeders
+package main
 
