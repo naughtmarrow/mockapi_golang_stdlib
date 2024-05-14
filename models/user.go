@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+    "errors"
 
 	"apitest.com/api/controllers"
 	"golang.org/x/crypto/bcrypt"
@@ -13,31 +14,31 @@ type User struct{
     Password string `json:"password"`
 }
 
-func (usr User) Create() User {
+func (usr User) Create() (User, error) {
     bytes, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 14) 
     if err != nil {
-        fmt.Printf("Error hashing password for user %d\n", usr.Id)
-        fmt.Println(err)
+        return usr, errors.New(fmt.Sprintf("Error hashing password for user %d with error: %s", usr.Id, err))
     }
+
     hashedpass := string(bytes)
+
     res, err := controllers.DB.Exec(`
         INSERT INTO admins (username, password)
         VALUES (?, ?);
     `, usr.Username, hashedpass)
     if err != nil {
-        fmt.Printf("Error inserting user with id %d into database", usr.Id)
-        fmt.Println(err)
+        return usr, errors.New(fmt.Sprintf("Error inserting user with id %d into database with error: %s", usr.Id, err))
     }
     
     insertedId, err := res.LastInsertId()
     return ReadUserById(int(insertedId))
 }
 
-func ReadAllUsers() []User {
+func ReadAllUsers() ([]User, error) {
     var users []User
     rows, err := controllers.DB.Query(`SELECT id, username, password FROM admins;`)
     if err != nil {
-        fmt.Println("Error querying all users", err)
+        return users, errors.New(fmt.Sprintf("Error querying all users with error: %s", err))
     }
     defer rows.Close()
 
@@ -45,52 +46,50 @@ func ReadAllUsers() []User {
         var u User
         err = rows.Scan(&u.Id, &u.Username, &u.Password) 
         if err != nil {
-            fmt.Println("Error scanning row during read all query", err)
+            return users, errors.New(fmt.Sprintf("Error scanning row during read all query with error: %s", err))
         }
         users = append(users, u)
     }
 
     err = rows.Err()
     if err != nil {
-        fmt.Println("Error in rows during read all query", err)
+        return users, errors.New(fmt.Sprintf("Error in rows during read all query with error: %s", err))
     }
 
-    return users
+    return users, nil
 }
 
-func ReadUserById(uid int) User {
+func ReadUserById(uid int) (User, error) {
     var resUsr User
     err := controllers.DB.QueryRow(`SELECT id, username, password FROM admins WHERE id = ?;`, uid).Scan(&resUsr.Id, &resUsr.Username, &resUsr.Password) 
     if err != nil {
-        fmt.Printf("Error querying user with id %d\n", uid)
-        fmt.Println(err)
+        return resUsr, errors.New(fmt.Sprintf("Error querying user with id %d with error: %s", uid, err))
     }
 
-    return resUsr
+    return resUsr, nil
 }
 
-func ReadUserByName(username string) User {
+func ReadUserByName(username string) (User, error) {
     var resUsr User
 
     err := controllers.DB.QueryRow(`SELECT id, username, password FROM admins WHERE username LIKE ?;`, username).Scan(&resUsr.Id, &resUsr.Username, &resUsr.Password)
     if err != nil {
-        fmt.Printf("Error querying user with username %s\n", username)
-        fmt.Println(err)
+        return resUsr, errors.New(fmt.Sprintf("Error querying user with username %s with error: %s", username, err))
     }
      
-    return resUsr
+    return resUsr, nil
 }
 
-func (usr User) Update(key string, value string){
+func (usr User) Update(key string, value string) (User, error){
     if key != "username" && key != "password" {
         fmt.Printf("Error updating user, key is invalid")
-        return
+        return usr, errors.New("Error updating user, key is invalid")
     }
+
     if key == "password" {
         bytes, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 14)
         if err != nil {
-            fmt.Printf("Error hashing password for user %d while updating\n", usr.Id)
-            fmt.Println(err)
+            return usr, errors.New(fmt.Sprintf("Error hashing password for user with id %d while updating with error: %s", usr.Id, err))
         }
         pass := string(bytes)   
         value = pass
@@ -100,23 +99,23 @@ func (usr User) Update(key string, value string){
 
     res, err := controllers.DB.Exec(query, value, usr.Id)
     if err != nil {
-        fmt.Printf("Error updating user with id %d\n", usr.Id)
-        fmt.Println(err)
+        return usr, errors.New(fmt.Sprintf("Error updating user with id %d with error: %s", usr.Id, err))
     }
     
     rows, err := res.RowsAffected()
     if err != nil {
-        fmt.Printf("Error updating user with id %d rows affected not received\n", usr.Id)
-        fmt.Println(err)
+        return usr, errors.New(fmt.Sprintf("Error updating user with id %d rows affected not received with error: %s", usr.Id, err))
     } else {
         fmt.Println("Rows affected: ", rows)
     }
+
+    return ReadUserById(usr.Id)
 }
 
-func (usr User) Delete(){
+func (usr User) Delete() error {
     _, err := controllers.DB.Exec(`DELETE FROM admins WHERE id = ?;`, usr.Id)
     if err != nil {
-        fmt.Printf("Error deleting user with id %d", usr.Id)
-        fmt.Println(err)
+        return errors.New(fmt.Sprintf("Error deleting user with id %d with error: %s", usr.Id, err))
     }
+    return nil
 }
