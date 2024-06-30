@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link href="css/style.css" rel="stylesheet" />
+    <script
+      src="https://unpkg.com/htmx.org@1.9.12"
+      integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <div class="upper-panel-users">
+      <div
+        id="user-list"
+        class="user-list"
+        hx-trigger="load"
+        hx-get="http://localhost:8080/users/admin"
+      ></div>
+      <div class="right-panel-users">
+        <h3 class="form-title">Create User:</h3>
+        <form
+          class="user-form"
+          hx-post="http://localhost:8080/users/admin"
+          hx-target="#result"
+        >
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required />
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required />
+          <button>Submit</button>
+        </form>
+      </div>
+    </div>
+    <div id="result" class="lower-panel-users"></div>
+  </body>
+</html>

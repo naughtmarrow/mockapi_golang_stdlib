@@ -25,9 +25,12 @@ func main() {
     // dbsetup end
 
 	mux := http.NewServeMux()
-	mux.Handle("/", &routes.DefaultRoute{})
+	mux.Handle("/", http.FileServer(http.Dir("./static")))
 	mux.Handle("/users", &routes.UsersRoute{})
     mux.Handle("/users/", &routes.UsersRoute{})
+    mux.Handle("/admin", http.StripPrefix("/admin", http.FileServer(http.Dir("./static"))))
+    mux.Handle("/admin/", http.StripPrefix("/admin/", http.FileServer(http.Dir("./static"))))
 
-    http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")), mux)
+    err = http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")), mux)
+    fmt.Printf("Error: %s", err);
 }
