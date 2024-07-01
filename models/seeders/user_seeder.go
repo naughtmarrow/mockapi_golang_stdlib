@@ -12,7 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main()  {  
+func _main()  {  
     godotenv.Load(".env")
 
 	dbpath := fmt.Sprintf("%s:%s@(%s:%s)/%s",

@@ -18,13 +18,13 @@
         id="user-list"
         class="user-list"
         hx-trigger="load"
-        hx-get="http://localhost:8080/users/admin"
+        hx-get="/users/admin"
       ></div>
       <div class="right-panel-users">
         <h3 class="form-title">Create User:</h3>
         <form
           class="user-form"
-          hx-post="http://localhost:8080/users/admin"
+          hx-post="/users/admin"
           hx-target="#result"
         >
           <label for="username">Username</label>

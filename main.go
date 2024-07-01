@@ -28,6 +28,10 @@ func main() {
 	mux.Handle("/", http.FileServer(http.Dir("./static")))
 	mux.Handle("/users", &routes.UsersRoute{})
     mux.Handle("/users/", &routes.UsersRoute{})
+    mux.Handle("/tags", &routes.TagsRoute{})
+    mux.Handle("/tags/", &routes.TagsRoute{})
+    mux.Handle("/blogs", &routes.BlogsRoute{})
+    mux.Handle("/blogs/", &routes.BlogsRoute{})
     mux.Handle("/admin", http.StripPrefix("/admin", http.FileServer(http.Dir("./static"))))
     mux.Handle("/admin/", http.StripPrefix("/admin/", http.FileServer(http.Dir("./static"))))
 
