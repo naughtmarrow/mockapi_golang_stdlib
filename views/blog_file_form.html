@@ -1,0 +1,5 @@
+<form class="blog-form" hx-encoding="multipart/form-data" hx-post={{ printf "/blogs/file/%d" .Id }}>
+    <label for="file">MD File:</label>
+    <input id="file" name="file" type="file" required />
+    <button>Submit</button>
+</form>

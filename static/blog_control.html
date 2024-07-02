@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.9.12"
+        integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="upper-panel-blog">
+        <div id="blog-list" class="blog-list" hx-trigger="load" hx-get="/blogs/admin"></div>
+        <div class="right-panel-blog">
+            <div>
+                <h3 class="form-title">Create Blog:</h3>
+                <form class="blog-form" hx-get="/blogs/admin" hx-target="#result">
+                    <label for="title">Title</label>
+                    <input id="title" name="title" type="text" required />
+                    <label for="description">Description</label>
+                    <input id="description" name="description" type="text" required />
+                    <button>Submit</button>
+                </form>
+            </div>
+            <div>
+                <h3 class="form-title">Update Blog File:</h3>
+                <form class="blog-form" hx-post="/blogs/admin/fileform" hx-target="this" hx-swap="outerHTML">
+                    <label for="blog-id">ID</label>
+                    <input id="blog-id" name="blog-id" type="number" required />
+                    <button>Submit</button>
+                </form>
+            </div>
+
+            <!-- temporary button just to test out the API -->
+            <div id="temp-button" hx-get="/blogs/file/3" hx-target="this">
+                <button>Get HTML</button>
+            </div>
+        </div>
+    </div>
+    <div id="result" class="lower-panel-blog"></div>
+</body>
+
+</html>

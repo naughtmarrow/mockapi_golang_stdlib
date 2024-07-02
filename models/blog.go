@@ -85,6 +85,24 @@ func (blog Blog) Delete() error {
 	return nil
 }
 
+func (blog Blog) UpdateLinks(mdlink string, htmllink string) error {
+    query := "UPDATE blogs SET link_to_md = ?, link_to_jsx = ? WHERE id = ?;"
+
+	res, err := controllers.DB.Exec(query, mdlink, htmllink, blog.Id)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error updating user with id %d with error: %s", blog.Id, err))
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error updating user with id %d rows affected not received with error: %s", blog.Id, err))
+	} else {
+		fmt.Println("Rows affected: ", rows)
+	}
+
+    return nil
+}
+
 /*
 ENTRIES:
 id INT AUTO_INCREMENT NOT NULL,
