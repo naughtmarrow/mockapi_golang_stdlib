@@ -76,7 +76,7 @@ func (d *TagsRoute) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		d.AddBlogToTagList(w, r)
 		return
 	case r.Method == http.MethodDelete && TagBlogListByIdRegex.MatchString(r.URL.Path):
-		d.DeleteTagById(w, r)
+        d.DeleteBlogInTagList(w, r)
 		return
 
 	default:
